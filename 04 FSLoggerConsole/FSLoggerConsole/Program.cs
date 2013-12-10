@@ -7,6 +7,8 @@ using mkFx.Framework;
 using Site.Framework;
 using Site.Job01;
 using Microsoft.Practices.Unity;
+using Microsoft.Practices.Unity.Configuration;
+using System.Configuration;
 
 namespace FSLoggerConsole
 {
@@ -18,16 +20,26 @@ namespace FSLoggerConsole
             if (System.IO.File.Exists(@"C:\FSLogger.log"))
                 System.IO.File.Delete(@"C:\FSLogger.log");
             
-            UnityContainer container = new UnityContainer();
+            IUnityContainer container = new UnityContainer();
+
+            //설정 내용을 컨테이너로 로딩한다.
+            UnityConfigurationSection section = (UnityConfigurationSection)ConfigurationManager.GetSection("unity");
+            //section.Containers["container01"].Configure(container);
+            section.Configure(container);
+
+
 
             //mkAppContext에 현재 컨테이너 참조 저장 
-            mkAppContext.Current.Container = container;
+            mkAppContext.Current.Container = container as UnityContainer; 
 
-            //UserInfo 매핑 정보를 등록한다. sigleton 패턴 사용 
-            //container.RegisterType<UserInfo, SiteUserInfo>(new ContainerControlledLifetimeManager());
 
-            //주목 1 : ILogger와 FSLogger의 매핑 정보를 등록한다. 
-            container.RegisterType<ILogger, FSLogger>(new ContainerControlledLifetimeManager());
+
+
+            ////UserInfo 매핑 정보를 등록한다. sigleton 패턴 사용 
+            ////container.RegisterType<UserInfo, SiteUserInfo>(new ContainerControlledLifetimeManager());
+
+            ////주목 1 : ILogger와 FSLogger의 매핑 정보를 등록한다. 
+            //container.RegisterType<ILogger, FSLogger>(new ContainerControlledLifetimeManager());
 
             SiteUserInfo userinfo = new SiteUserInfo("mkkim2");
             container.RegisterInstance<UserInfo>(userinfo, new ContainerControlledLifetimeManager());
